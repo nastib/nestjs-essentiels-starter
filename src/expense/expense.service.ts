@@ -1,10 +1,9 @@
-import { log } from 'console';
 import {
   ForbiddenException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { Expense } from 'prisma/generated/prisma-client-js';
+import { Expense } from '@prisma/client';
 import { PrismaService } from 'src/prisma';
 import { CreateExpenseDto, UpdateExpenseDto } from './dto';
 import { PaginateDto, PaginateResultDto } from 'src/common/dto';
@@ -123,7 +122,6 @@ export class ExpenseService {
     if (!expense) throw new NotFoundException('Resource does not exist');
     if (expense.userId !== userId)
       throw new ForbiddenException('Access to resource unauthorized');
-    log(expense);
     await this.prisma.expense.delete({
       where: {
         id: expenseId,

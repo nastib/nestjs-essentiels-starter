@@ -1,4 +1,5 @@
 import {
+  IsArray,
   IsEmail,
   IsNotEmpty,
   IsOptional,
@@ -22,4 +23,8 @@ export class AuthSignupDto {
   @IsString()
   @IsOptional()
   lastName: string;
+
+  @IsOptional()
+  @IsArray()
+  roles: string[];
 }

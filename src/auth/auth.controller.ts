@@ -6,11 +6,9 @@ import {
   Body,
   Session,
 } from '@nestjs/common';
-import { UserSession } from './types';
+import { UserRoles, UserSession } from './types';
 import { AuthService } from './auth.service';
-import { AuthSignupDto } from './dto';
-import { AuthSigninDto } from './dto';
-import { Role } from './enums';
+import { AuthSignupDto, AuthSigninDto } from './dto';
 import { PublicRoute } from './decorators';
 
 @PublicRoute()
@@ -20,25 +18,32 @@ export class AuthController {
 
   @Post('signup')
   async signup(@Body() dto: AuthSignupDto, @Session() session: UserSession) {
-    const { id, email } = await this.authService.signup(dto);
-    return this.serializeSession(id, email, session);
+    const { id, email, roles } = await this.authService.signup(dto);
+
+    return this.serializeSession(id, email, roles, session);
   }
 
   @Post('signin')
   @HttpCode(HttpStatus.OK)
   async signin(@Body() dto: AuthSigninDto, @Session() session: UserSession) {
-    const { id, email } = await this.authService.signin(
+    const { id, email, roles } = await this.authService.signin(
       dto.email,
       dto.password,
     );
-    return this.serializeSession(id, email, session);
+
+    return this.serializeSession(id, email, roles, session);
   }
 
-  private serializeSession(id: number, email: string, session: UserSession) {
+  private serializeSession(
+    id: number,
+    email: string,
+    roles: UserRoles[],
+    session: UserSession,
+  ) {
     session.user = {
       userId: id,
       email: email,
-      roles: [Role.ADMIN],
+      roles: roles.map((item) => item.name),
     };
 
     return { ...session };
